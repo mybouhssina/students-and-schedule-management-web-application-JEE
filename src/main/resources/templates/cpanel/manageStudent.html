@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="inclusion :: head">
+    <title id="pageTitle">Cpanel - Gérer les étudiants</title>
+    <div id="inclusions">
+
+    </div>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div th:replace="inclusion :: sidebar">...</div>
+    <div class="main-panel">
+
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg " color-on-scroll="500">
+            <div class=" container-fluid  ">
+                <a class="navbar-brand" href="#pablo"> CPanel </a>
+                <button href="" class="navbar-toggler navbar-toggler-right"
+                        type="button" data-toggle="collapse"
+                        aria-controls="navigation-index" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end"
+                     id="navigation" th:insert="inclusion :: navbar"></div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row"  >
+                    <div class="col-md-12">
+                        <div class="card ">
+                            <div class="card-header ">
+                                <h4 class="card-title">Gérer les étudiants</h4>
+                            </div>
+                            <div class="card-body ">
+                                <button type="button" class="btn btn-primary float-right" onclick="addStudent()">Ajouter un étudiant</button><br/><br/><br/>
+                                <table
+                                        id="studentsTable"
+                                        class="table table-striped table-bordered" cellspacing="0"
+                                        width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Nom d'utilisateur</th>
+                                        <th>groupe</th>
+                                        <th>Modifier</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="student : ${students}">
+                                        <td th:text="${student.getLName()}"></td>
+                                        <td th:text="${student.getFName()}"></td>
+                                        <td th:text="${student.username}"></td>
+                                        <td th:text="${student.currentGroup.name}"></td>
+                                        <td style="text-align: center">
+                                            <a href="#" th:attr="onclick=${'editStudent('+student.id+','''+student.lName+''','''+student.fName+''','''+student.username+''','+student.currentGroup.id+')'}">
+                                                <img class="action-icon" th:src="@{/img/edit.png}"/>
+                                            </a>
+                                            <a href="#" th:attr="onclick=${'deleteStudent('+student.id+')'}">
+                                                <img class="action-icon" th:src="@{/img/delete.png}"/>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="form">
+                    <div class="col-md-12">
+                        <div class="card ">
+                            <div class="card-header ">
+                                <h4 class="card-title">Formulaire</h4>
+                            </div>
+                            <div class="card-body ">
+                                <form action="#" th:action="@{/cpanel/students}" th:object="${student}" method="post" >
+                                    <input type="hidden" th:field="*{id}"/>
+                                    <div class="form-group">
+                                        <div th:if="${#fields.hasErrors('lName')}" class="alert alert-danger">
+                                            <p th:if="${#fields.hasErrors('lName')}" th:errors="*{lName}"></p>
+                                        </div>
+                                        <label>Nom</label>
+                                        <input type="text" class="form-control" th:field="*{lName}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <div th:if="${#fields.hasErrors('fName')}" class="alert alert-danger">
+                                            <p th:if="${#fields.hasErrors('fName')}" th:errors="*{fName}"></p>
+                                        </div>
+                                        <label>Prénom</label>
+                                        <input type="text" class="form-control" th:field="*{fName}" required>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <div th:if="${#fields.hasErrors('username')}" class="alert alert-danger">
+                                            <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+                                        </div>
+                                        <label>Nom d'utilisateur</label>
+                                        <input type="text" class="form-control" th:field="*{username}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <div th:if="${#fields.hasErrors('password')}" class="alert alert-danger">
+                                            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+                                        </div>
+                                        <label>Mot de passe</label>
+                                        <input type="password" class="form-control" th:field="*{password}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <div th:if="${#fields.hasErrors('passwordConfirmation')}" class="alert alert-danger">
+                                            <p th:if="${#fields.hasErrors('passwordConfirmation')}" th:errors="*{passwordConfirmation}"></p>
+                                        </div>
+                                        <label>Confirmation du mot de passe</label>
+                                        <input type="password" class="form-control" th:field="*{passwordConfirmation}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <div th:if="${#fields.hasErrors('currentGroup')}" class="alert alert-danger">
+                                            <p th:if="${#fields.hasErrors('currentGroup')}" th:errors="*{currentGroup}"></p>
+                                        </div>
+                                        <label >Groupe</label>
+                                        <select class="form-control" th:field="*{currentGroup.id}">
+                                            <option th:each="group: ${groups}" th:text="${group.name}" th:attr="value=${group.id}" ></option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:insert="inclusion :: footer">...</div>
+    </div>
+</div>
+
+
+
+
+
+</body>
+<script>
+    $(function(){
+        $("#studentsTable").DataTable();
+        var error = [[${(error==null)? false:error}]];
+        var success = [[${(success==null)? false:success}]];
+        if(error)
+            scrollToForm();
+        if(success) {
+            demo.showNotification("Opération terminée avec succès");
+            clearFormInputs();
+        }
+    });
+    function clearFormInputs(){
+        $('input').each(function () {
+            $(this).val('');
+        });
+    }
+    function addStudent(){
+        clearFormInputs();
+        $("#id").val('');
+        scrollToForm();
+    }
+    function editStudent(id,lname,fname,username,groupId){
+        $("#id").val(id);
+        $("#lName").val(lname);
+        $("#fName").val(fname);
+        $("#username").val(username);
+        $("select").val(groupId);
+        scrollToForm();
+    }
+    function scrollToForm(){
+        document.getElementById('form').scrollIntoView();
+    }
+
+    function deleteStudent(id){
+        window.location.href="/cpanel/deleteStudent?studentId="+id;
+    }
+</script>
+</html>

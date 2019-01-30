@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="inclusion :: head">
+    <title id="pageTitle">Cpanel - Sélectionner la session</title>
+    <div id="inclusions">
+
+    </div>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div th:replace="inclusion :: sidebar">...</div>
+    <div class="main-panel">
+
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg " color-on-scroll="500">
+            <div class=" container-fluid  ">
+                <a class="navbar-brand" href="#pablo"> CPanel </a>
+                <button href="" class="navbar-toggler navbar-toggler-right"
+                        type="button" data-toggle="collapse"
+                        aria-controls="navigation-index" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end"
+                     id="navigation" th:insert="inclusion :: navbar"></div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row"  >
+                    <div class="col-md-12">
+                        <div class="card ">
+                            <div class="card-header ">
+                                <h4 class="card-title">Sélectionner la session</h4>
+                            </div>
+                            <div class="card-body ">
+                                <table
+                                        id="sessionsTable"
+                                        class="table table-striped table-bordered" cellspacing="0"
+                                        width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Id séance</th>
+                                        <th>Date session</th>
+                                        <th>Matière</th>
+                                        <th>Gérer les notes</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="examSession : ${examSessions}">
+                                        <td th:text="${examSession.id}"></td>
+                                        <td th:text="${#dates.format(examSession.startingDate,'dd MMM yyyy hh:mm')}"></td>
+                                        <td th:text="${examSession.subject.name}"></td>
+                                        <td style="text-align: center">
+                                            <a href="#" th:attr="onclick=${'enterNotes('+examSession.id+')'}">
+                                                <img class="action-icon" th:src="@{/img/edit.png}"/>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:insert="inclusion :: footer">...</div>
+    </div>
+</div>
+
+
+
+
+
+</body>
+<script>
+    function enterNotes(idSession){
+        window.location.href = "/enterNotes?examSessionId="+idSession;
+    }
+    $(function(){
+        $("#sessionsTable").DataTable();
+    });
+</script>
+</html>

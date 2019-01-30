@@ -1,0 +1,30 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title> Page non trouvé </title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link href="/css/error.css" rel="stylesheet"/>
+</head>
+
+
+<body>
+
+<div class="unicorn"></div>
+
+<div class="container">
+
+    <div class="four-oh-four"><h1>Erreur !</h1></div>
+
+    <div class="warning">
+
+        <p>La page est introuvable ou vous n'avez pas les droits requis pour y accéder</p>
+        <a th:href="@{/login}"> Aller à la page d'accueil</a>
+    </div>
+
+    <div class="footer"><p class="copyright">&copy; 2013 Redfrost.com</p></div>
+
+</div><!-- /.container -->
+</body>
+</html>
+

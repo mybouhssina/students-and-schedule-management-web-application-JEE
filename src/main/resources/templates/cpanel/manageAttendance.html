@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="inclusion :: head">
+    <title id="pageTitle">Cpanel - Gérer l'absence</title>
+    <div id="inclusions">
+
+    </div>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div th:replace="inclusion :: sidebar">...</div>
+    <div class="main-panel">
+
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg " color-on-scroll="500">
+            <div class=" container-fluid  ">
+                <a class="navbar-brand" href="#pablo"> CPanel </a>
+                <button href="" class="navbar-toggler navbar-toggler-right"
+                        type="button" data-toggle="collapse"
+                        aria-controls="navigation-index" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end"
+                     id="navigation" th:insert="inclusion :: navbar"></div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row"  >
+                    <div class="col-md-12">
+                        <div class="card ">
+                            <div class="card-header ">
+                                <h4 class="card-title">Liste des étudiants absents</h4>
+                            </div>
+                            <div class="card-body ">
+                                <input type="hidden" id="sessionId" name="sessionId" th:value="${sessionId}"/>
+                                <table
+                                        id="attendanceTable"
+                                        class="table table-striped table-bordered" cellspacing="0"
+                                        width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>ID étudiant</th>
+                                        <th>Nom étudiant</th>
+                                        <th>Justifié?</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="studentAttendance : ${studentsAttendance}">
+                                        <td th:text="${studentAttendance.key.student.id}"></td>
+                                        <td th:text="${studentAttendance.key.student.fullName}"></td>
+                                        <td> <input name="student" type="checkbox" th:value="${studentAttendance.key.student.id}" th:checked="${studentAttendance.isJustified}"/>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-primary float-right" onclick="submitAttendance()">Valider</button><br/><br/><br/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:insert="inclusion :: footer">...</div>
+    </div>
+</div>
+
+
+
+
+
+</body>
+<script>
+    var sessionsTable;
+    $(function(){
+        attendanceTable = $("#attendanceTable").DataTable();
+        var success= [[${success==null?false:success}]];
+        if(success)
+            demo.showNotification("Les modifications ont été sauvegardé avec succès");
+    });
+
+    function submitAttendance(){
+        window.location.href= "/cpanel/saveAttendanceJustification?"+attendanceTable.$("input").serialize()+"&"+$("#sessionId").serialize();
+    }
+</script>
+</html>

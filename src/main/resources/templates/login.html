@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login Form</title>
+  
+      <link rel="stylesheet" type ="text/css" th:href="@{/css/login.css}"/>
+      <link rel="stylesheet" type ="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+      
+
+  
+</head>
+
+<body>
+	<div th:if="${param.error}">
+			<div class="alert alert-danger">
+			  Mauvaise combinaison login/mot de passe
+			</div>
+           
+      </div>
+
+	<div th:if="${param.logout}">
+			<div class="alert alert-info">
+			  	Vous a été déconnecté
+			</div>
+     </div>
+	
+  <div class="login">
+  
+  <div class="login-triangle"></div>
+  
+  <h2 class="login-header">Se connecter</h2>
+  
+
+  <form class="login-container" method="post" th:action="@{/login}" >
+    <p><input type="text" name="username" placeholder="Nom d'utilisateur" required></p>
+    <p><input type="password" name = "password" placeholder="Mot de passe" required></p>
+    <p><input type="submit" value="Se connecter"></p>
+  </form>
+  
+</div>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+
+  
+
+</body>
+
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="inclusion :: head">
+    <title id="pageTitle">Faire l'appel</title>
+    <div id="inclusions">
+    </div>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div th:replace="inclusion :: sidebar">...</div>
+    <div class="main-panel">
+
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg " color-on-scroll="500">
+            <div class=" container-fluid  ">
+                <a class="navbar-brand" href="#pablo"> Faire l'appel </a>
+                <button href="" class="navbar-toggler navbar-toggler-right"
+                        type="button" data-toggle="collapse"
+                        aria-controls="navigation-index" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end"
+                     id="navigation" th:insert="inclusion :: navbar"></div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+        <div class="content">
+
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card ">
+                            <div class="card-header ">
+                                <h4 class="card-title">Veuillez preciser les informations
+                                    demande</h4>
+                            </div>
+                            <div class="card-body ">
+                                <div class="form-group">
+                                    <label>Groupe</label> <select
+                                        class="form-control" id="group">
+
+                                    <option disabled selected="selected"
+                                            th:if="${groupes==null || groupes.empty}">Vous
+                                        n'etes responsable d'aucun group</option>
+                                    <option disabled selected="selected"
+                                            th:unless="${groupes==null || groupes.empty}">
+                                        Selectionner un group</option>
+                                    <option th:each="group : ${groupes}"
+                                            th:attr="value=${group.id}">[[${group.name}]]</option>
+                                </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="session">Seance</label> <select
+                                        class="form-control" id="session" name="session" disabled>
+                                </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="display:none;" id="studentsTableContainer" >
+                    <div class="col-md-12">
+
+                        <div class="card ">
+                            <div class="card-body ">
+                                <form method="post" id="container" action="absence">
+                                    <table id="studentsTable"
+                                           class="table table-striped table-bordered" cellspacing="0"
+                                           width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Numero Etudiant</th>
+                                            <th>Nom</th>
+                                            <th>Prenom</th>
+                                            <th>Absent?</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="tableContent"></tbody>
+                                    </table>
+                                    <button id="submitAttendance"
+                                            class="btn btn-primary btn-block">Confimer</button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:insert="inclusion :: footer">...</div>
+    </div>
+</div>
+
+</body>
+<script>
+
+    function formatDate(d, f) {
+
+        var separator = "/";
+
+        var D = d.getDate();
+        D = (D < 10) ? ("0" + D) : D;
+
+        //getMonth starts months count from 0
+        var M = d.getMonth() + 1;
+        M = (M < 10) ? ("0" + M) : M;
+
+        // 				var y = d.getYear();
+
+        var h = d.getHours();
+        h = (h < 10) ? ("0" + h) : h;
+
+        var m = d.getMinutes();
+        m = (m < 10) ? ("0" + m) : m;
+
+        // 				var s = d.getSeconds();
+        // 				s = (s < 10) ? ("0" + s) : s;
+
+
+        if (f == "dd/MM hh:mm")
+            return D + separator + M + " " + h + ":" + m;
+        else if (f == "hh:mm")
+            return h + ":" + m;
+    }
+    var studentsTable;
+    $('#group').change(
+        function() {
+            $("#tableContent").empty();
+            $.ajax({
+                type : "GET",
+                url : "REST/group/" + $(this).val() + "/sessions",
+                success : function(response) {
+                    var $sessionSelect = $("#session");
+                    $sessionSelect.empty();
+                    if(!response){
+                        var $option = $("<option>", {
+                            html : "aucune séance en cours n'a été trouvé"
+                        });
+                        $sessionSelect.prop('disabled', true);
+                        $sessionSelect.append($option);
+                    }
+                    else{
+                        $sessionSelect.prop('disabled', false);
+                        $sessionSelect.append($option);
+                        var startingDate = new Date(response.startingDate);
+
+                        var endingDate = new Date(startingDate.getTime());
+                        endingDate.setHours(endingDate.getHours()+2);
+                        var $option = $("<option>", {
+                            value : response.id,
+                            html : formatDate((startingDate),
+                                "dd/MM hh:mm")
+                            + " - "
+                            + formatDate(endingDate,
+                                "hh:mm")
+                        });
+                        $sessionSelect.append($option);
+                        $sessionSelect.change();
+                    }
+                },
+                error : function() {
+                    alert('Echec de connexion au serveur000');
+                }
+            });
+        });
+    $("#studentsTableContainer").fadeIn();
+    $('#session').change(
+        function(){
+            var $tableContent = $("#tableContent");
+            $tableContent.empty();
+            $.ajax({
+                type : "GET",
+                url : "REST/session/"+ $(this).val() +"/students",
+                success : function(response) {
+                    $.each(response, function(key, val) {
+                        var $tr = $("<tr>");
+                        $tr.append($("<td>" , {html : val.id}));
+                        $tr.append($("<td>" , {html : val.lname}));
+                        $tr.append($("<td>" , {html : val.fname}));
+                        var $td = $("<td>" );
+                        var $input = $("<input>" , {type : "checkbox",
+                            name : "isAbsent",
+                            value : val.id,
+                        });
+                        $td.append($input);
+                        $tr.append($td);
+                        $tableContent.append($tr);
+                    });
+                    $.ajax({
+                        type : "GET",
+                        url : "REST/session/"+ $("#session").val() +"/attendance",
+                        success : function(response) {
+                            $("input[type='checkbox']").each(function(){
+                                if($.inArray(parseInt($(this).val()),response)!=-1){
+                                    $(this).prop('checked', true);
+                                }
+                            })
+                            studentsTable = $("#studentsTable").DataTable();
+                        },
+                        error : function() {
+                            alert('Echec de connexion au serveur2');
+                        }
+
+                    });
+                   // $("#studentsTable").DataTable();
+                },
+                error : function() {
+                    alert('Echec de connexion au serveur1');
+                }
+
+            });
+
+        });
+    $('#submitAttendance').click( function(event)
+        {
+            event.preventDefault();
+            var data = studentsTable.$("input").serialize();
+            $.ajax({
+                type : "PUT",
+                url : "REST/session/"+ $("#session").val() +"/attendance",
+                data : data,
+                success : function() {
+                    bootbox.alert({
+                        message: "Opération terminée avec succès",
+                        backdrop: true
+                    });
+                },
+                error : function() {
+                    alert('Echec de connexion au serveur');
+                }
+
+            });
+        }
+    );
+
+</script>
+
+
+</html>

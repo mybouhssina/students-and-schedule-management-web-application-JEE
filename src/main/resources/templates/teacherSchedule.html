@@ -1,0 +1,171 @@
+        <!DOCTYPE html>
+        <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+        <head th:include="inclusion :: head">
+            <title id="pageTitle">Détails de l'étudiant</title>
+            <div id="inclusions">
+                <link rel="stylesheet" href="/css/studentDetails.css">
+                <link rel="stylesheet" href="/css/schedule-reset.css"> <!-- CSS reset -->
+                <link rel="stylesheet" href="/css/schedule-style.css"> <!-- Resource style -->
+                <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600" rel="stylesheet">
+            </div>
+        </head>
+
+        <body>
+
+        <div class="wrapper">
+
+            <div th:replace="inclusion :: sidebar">...</div>
+            <div class="main-panel">
+
+                <!-- Navbar -->
+                <nav class="navbar navbar-expand-lg " color-on-scroll="500">
+                    <div class=" container-fluid  ">
+                        <a class="navbar-brand" href="#pablo"> Faire l'appel </a>
+                        <button href="" class="navbar-toggler navbar-toggler-right"
+                                type="button" data-toggle="collapse"
+                                aria-controls="navigation-index" aria-expanded="false"
+                                aria-label="Toggle navigation">
+                            <span class="navbar-toggler-bar burger-lines"></span> <span
+                                class="navbar-toggler-bar burger-lines"></span> <span
+                                class="navbar-toggler-bar burger-lines"></span>
+                        </button>
+                        <div class="collapse navbar-collapse justify-content-end"
+                             id="navigation" th:insert="inclusion :: navbar"></div>
+                    </div>
+                </nav>
+                <!-- End Navbar -->
+                <div class="content">
+
+                    <div class="container-fluid">
+
+                        <div class="row"  >
+                            <div class="col-md-12">
+
+                                <div class="card ">
+                                    <div class="card-header ">
+                                        <h4 class="card-title">Vos information</h4>
+                                    </div>
+                                    <div class="card-body ">
+                                        <ul class="list-group">
+                                            <li class="list-group-item" th:text="${'id : ' + teacher.id}"></li>
+                                            <li class="list-group-item" th:text="${'nom : ' + teacher.lName} "></li>
+                                            <li class="list-group-item" th:text="${'prénom : ' + teacher.fName} "></li>
+                                            <li class="list-group-item"> Groupes sous votre responsabilité :
+                                                <p style="padding-left:250px" th:each="group : ${teacher.groupesResponsible}" th:text="${'-'+group.name}"></p>
+                                                <p style="padding-left:250px" th:if="${teacher.groupesResponsible.isEmpty()}" >aucun groupe n'est sous votre responsabilité</p>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="cd-schedule loading" style="margin-bottom : 40px;">
+                                <div class="timeline">
+                                    <ul>
+                                        <li><span>08:00</span></li>
+                                        <li><span>08:30</span></li>
+                                        <li><span>09:00</span></li>
+                                        <li><span>09:30</span></li>
+                                        <li><span>10:00</span></li>
+                                        <li><span>10:30</span></li>
+                                        <li><span>11:00</span></li>
+                                        <li><span>11:30</span></li>
+                                        <li><span>12:00</span></li>
+                                        <li><span>12:30</span></li>
+                                        <li><span>13:00</span></li>
+                                        <li><span>13:30</span></li>
+                                        <li><span>14:00</span></li>
+                                        <li><span>14:30</span></li>
+                                        <li><span>15:00</span></li>
+                                        <li><span>15:30</span></li>
+                                        <li><span>16:00</span></li>
+                                        <li><span>16:30</span></li>
+                                        <li><span>17:00</span></li>
+                                        <li><span>17:30</span></li>
+                                        <li><span>18:00</span></li>
+                                    </ul>
+                                </div> <!-- .timeline -->
+
+                                <div class="events">
+                                    <ul th:each="dayprogram,iter : ${weekProgram}">
+                                        <li class="events-group">
+                                            <div class="top-info"><span th:text="${weekDays[iter.index]}"></span></div>
+                                            <ul>
+                                                <li th:each="daySession,iter2 : ${dayprogram}" class="single-event" th:attr= "data-start=${#dates.format(daySession.startingDate, 'HH:mm')}, data-end=${#dates.format(daySession.endDate, 'HH:mm')}, data-event=${'event-'+randomColor[iter.index%5][iter2.index%4]}" >
+                                                    <a>
+                                                        <em class="event-name" th:text="${'['+daySession.typeAbr+']'}"></em>
+                                                        <em class="event-name" th:text="${daySession.subject.name}"></em>
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <em style="text-align: right" class="event-name" th:text="${'Salle : ' +daySession.classRoom.name}"></em>
+                                                        <em class="event-name" style="font-size: 15px;text-align: right;" th:text="'('+${daySession.group.name}+')'"></em>
+                                                        <div class='sessionDetails' style="display:none">
+                                                            <ul>
+                                                                <ul class="list-group">
+                                                                    <li class="list-group-item">Informations sur la séance</li>
+                                                                    <li class="list-group-item">Heure début : 8h </li>
+                                                                    <li class="list-group-item">Durée : 2h </li>
+                                                                    <li class="list-group-item" th:text="${'Matière : ' + daySession.subject.name}" ></li>
+                                                                    <li class="list-group-item" th:text="${'Type de séance : ' + daySession.type}" ></li>
+                                                                    <li class="list-group-item" th:text="${'Groupe : ' + daySession.group.name}"></li>
+                                                                    <li class="list-group-item" th:text="${'Salle : ' + daySession.classRoom.name}"></li>
+                                                                </ul>
+                                                            </ul>
+                                                        </div>
+                                                    </a>
+
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="event-modal">
+                                    <header class="header">
+                                        <div class="content">
+                                            <span class="event-date"></span>
+                                            <h3 class="event-name"></h3>
+                                        </div>
+
+                                        <div class="header-bg"></div>
+                                    </header>
+
+                                    <div class="body">
+                                        <div class="event-info"></div>
+                                        <div class="body-bg"></div>
+                                    </div>
+
+                                    <a href="#0" class="close">Close</a>
+                                </div>
+
+                                <div class="cover-layer"></div>
+                            </div>
+
+                        </div>
+                        <br><br><br>
+                        <div style="text-align: center">
+                            <button onclick="downloadSchedule()" style="font-size:20px; text-align: center" class="btn btn-primary">Télécharger l'emploi</button>
+                        </div>
+
+
+
+                    </div>
+                </div>
+                <div th:insert="inclusion :: footer">...</div>
+            </div>
+        </div>
+
+        </body>
+        <script>
+            function downloadSchedule(){
+                window.open('/download/teacherSchedule', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+            }
+        </script>
+        <script src="/js/schedule-modernizr.js"></script>
+        <script src="/js/schedule-main.js"></script>
+        </html>

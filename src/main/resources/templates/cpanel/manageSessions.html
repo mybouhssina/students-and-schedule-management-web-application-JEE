@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="inclusion :: head">
+    <title id="pageTitle">Cpanel - Gérer les étudiants</title>
+    <div id="inclusions">
+    </div>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div th:replace="inclusion :: sidebar">...</div>
+    <div class="main-panel">
+
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg " color-on-scroll="500">
+            <div class=" container-fluid  ">
+                <a class="navbar-brand" href="#pablo"> CPanel </a>
+                <button href="" class="navbar-toggler navbar-toggler-right"
+                        type="button" data-toggle="collapse"
+                        aria-controls="navigation-index" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span> <span
+                        class="navbar-toggler-bar burger-lines"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end"
+                     id="navigation" th:insert="inclusion :: navbar"></div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Niveau : </label>
+                                    <select id="grade" class="form-control" style="height: 40px; font-size:100%;">
+                                        <option selected disabled>Selectionner un niveau</option>
+                                        <option value="1">Première année</option>
+                                        <option value="2">Deuxième année</option>
+                                        <option value="3">Troisième année</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Groupe</label>
+                                    <select id="group" class="form-control" style="height: 40px; font-size:100%;">
+                                        <option selected disabled>Selectionner un niveau d'abord</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="display:none;" id="weekDiv">
+                                    <label>Semaine</label>
+                                    <select id="week" class="form-control" style="height: 40px; font-size:100%;">
+                                        <option selected disabled>Selectionner une semaine</option>
+                                        <option value="1" th:text="${'Semaine actuelle : ' + #dates.format(weekMonday,'dd/MM') + ' - ' + #dates.format(weekFriday,'dd/MM')}">  </option>
+                                        <option value="2" th:text="${'Semaine Prochaine : ' + #dates.format(nextWeekMonday,'dd/MM') + ' - ' + #dates.format(nextWeekFriday,'dd/MM')}">  </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="schedules">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:insert="inclusion :: footer">...</div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+    var gradeSelect = $("#grade");
+    var groupSelect = $("#group");
+    var weekSelect = $("#week");
+    var weekDiv = $("#weekDiv");
+    function getGradeGroups(id) {
+        $.get({
+            url : "/REST/grade/"+gradeSelect.val()+"/groups",
+            data : null,
+            success : function(response) {
+                var noGroups = response==null || (response.toString().length)===0 ;
+                groupSelect.empty();
+                if(noGroups){
+                    groupSelect.append($('<option>', {
+                        text: 'Pas de groupe trouvé pour ce niveau',
+                        disabled : 'true',
+                        selected : 'true'
+                    }));
+                }
+                else{
+                    groupSelect.append($('<option>', {
+                        text: "Veuillez selecitonner un groupe"
+                    }));
+                    $.each(response, function(key, val) {
+                        groupSelect.append($('<option>', {
+                            value: val.id,
+                            text: val.name,
+                        }));
+                    });
+                }
+            },
+            error : function() {
+                alert('Echec de connexion au serveur');
+            }
+
+        });
+    }
+
+    function manageSchedule(week){
+        /*$.get({
+            url : "/schedule",
+            data : "groupId="+groupSelect.val()+"&week="+weekSelect.val(),
+            success : function(response) {
+                alert(response);
+                 $("#schedules").replaceWith($(response).find("#mySchedule"));
+            },
+            error : function() {
+                alert('Echec de connexion au serveur');
+            }
+
+        });*/
+        window.location.href = "/schedule?"+"groupId="+groupSelect.val()+"&week="+weekSelect.val();
+    }
+    $(function () {
+        gradeSelect.change(function (val) {
+            weekDiv.fadeOut();
+            getGradeGroups(gradeSelect.id);
+        });
+        groupSelect.change(function(){
+            weekDiv.fadeIn();
+        });
+        weekSelect.change(function(){
+            manageSchedule(weekSelect.val());
+        })
+    });
+
+
+</script>
+</html>
